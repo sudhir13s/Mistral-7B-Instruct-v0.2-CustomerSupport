@@ -1,0 +1,87 @@
+# ==============================================================================
+# Customer Support Fine-Tuning Configuration (Mistral-7B-Instruct-v0.2)
+# ==============================================================================
+
+# Model Selection & Advanced Loading
+model:
+  base_model: "mistralai/Mistral-7B-Instruct-v0.2"
+  device_map: "auto"
+  trust_remote_code: true
+  use_cache: false                     # Must be false for training
+  torch_dtype: "bfloat16"              # Options: "float16", "bfloat16", "float32"
+  attn_implementation: "flash_attention_2" # Use "sdpa" or "flash_attention_2" if supported
+  load_in_8bit: false                  # Mutually exclusive with 4-bit
+  load_in_4bit: true
+
+# Tokenizer Configuration
+tokenizer:
+  padding_side: "right"               # Consistency with generation
+  add_eos_token: true                 # Critical for stopping hallucination
+  add_bos_token: true                 # Mistral requires BOS
+  max_seq_length: 1024                # Context window size
+  truncation: true                    # Drop text beyond max_seq_length
+  model_max_length: 1024
+
+# LoRA (Low-Rank Adaptation) Hyperparameters
+# These parameters define the trainable "adapter" layers.
+lora:
+  r: 16                               # Rank: Number of trainable dimensions (16 is stable for 7B)
+  lora_alpha: 32                      # Scaling factor: Higher compensates for lower rank
+  target_modules:                     # Modules to attach adapters to
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  lora_dropout: 0.05                  # Regularization to prevent overfitting
+  bias: "none"                        # Setting to 'none' is standard for PEFT
+  task_type: "CAUSAL_LM"
+  layers_to_transform: null           # List of layer indices to transform (null = all)
+  modules_to_save: null               # Extra modules to train/save (e.g., embed_tokens)
+
+# Quantization (bitsandbytes)
+# Enables 4-bit loading (QLoRA) to fit into 16GB VRAM.
+quantization:
+  bnb_4bit_compute_dtype: "bfloat16"  # 'bfloat16' for better stability on A100/L4
+  bnb_4bit_quant_type: "nf4"          # NormalFloat 4 (optimized for weights)
+  bnb_4bit_use_double_quant: true      # Quantize the quantization constants
+  llm_int8_threshold: 6.0             # For 8-bit quantization outliers
+  llm_int8_has_fp16_weight: false
+
+# Training Hyperparameters (SFTTrainer / TrainingArguments)
+training:
+  output_dir: "./models/adapters"
+  num_train_epochs: 3                 # Standard for instruction tuning
+  per_device_train_batch_size: 4      # Optimized for T4/16GB VRAM
+  gradient_accumulation_steps: 4      # Effective batch size = 16 (4 * 4)
+  learning_rate: 2.0e-4               # Standard for LoRA/Mistral
+  weight_decay: 0.001                 # Penalty for model complexity
+  optimizer: "paged_adamw_32bit"      # Offloads state to CPU if VRAM spikes
+  lr_scheduler_type: "cosine"         # Smooth decay towards end of training
+  warmup_steps: 50                    # Gradual start to prevent weight shock
+  warmup_ratio: 0.03                  # Alternative to warmup_steps
+  logging_steps: 10                   # Frequency of reporting to console/W&B
+  save_strategy: "epoch"              # Save checkpoints per epoch
+  evaluation_strategy: "steps"        # Evaluate on validation set every N steps
+  eval_steps: 50
+  save_total_limit: 3                 # Keep only the N most recent checkpoints
+  max_grad_norm: 0.3                  # Gradient clipping to prevent explosion
+  group_by_length: true                # Batch sequences of similar length (saves VRAM)
+  fp16: true                          # Half-precision training speed-up
+  bf16: false                         # Set to true only if using A100/L4 GPUs
+  report_to: "tensorboard"            # Options: "wandb", "tensorboard", "none"
+  push_to_hub: false                  # Whether to push to HF Hub during training
+  hub_model_id: "sudhir13s/mistral-7b-support-adapter"
+  hub_strategy: "every_save"
+  gradient_checkpointing: true        # Slower but uses much less VRAM
+  neftune_noise_alpha: null           # Add noise to embeddings for robustness (try 5)
+
+# Dataset Settings
+dataset:
+  hf_path: "bitext/Bitext-customer-support-llm-chatbot-training-dataset"
+  train_split: "train"
+  test_size: 0.1
+  packing: false                      # Pack multiple examples into one sequence
+  dataset_text_field: "text"
