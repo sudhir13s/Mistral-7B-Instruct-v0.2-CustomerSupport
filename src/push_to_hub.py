@@ -17,10 +17,10 @@ def push_to_hub():
     # --- 1. Authentication ---
     hf_token = os.getenv("HF_TOKEN")
     if not hf_token:
-        print("❌ Error: HF_TOKEN environment variable not found.")
+        print("Error: HF_TOKEN environment variable not found.")
         return
     
-    print("🔑 Authenticating with Hugging Face...")
+    print("Authenticating with Hugging Face...")
     login(token=hf_token)
     
     api = HfApi()
@@ -30,7 +30,7 @@ def push_to_hub():
     hf_user = os.getenv("HF_USER_NAME", "your-hf-username")
     repo_id = train_cfg.get('hub_model_id', f"{hf_user}/mistral-7b-support-adapter")
     
-    print(f"🚀 Pushing adapter to Hub: {repo_id}...")
+    print(f"Pushing adapter to Hub: {repo_id}...")
     
     # --- 3. Upload Adapter Weights ---
     api.create_repo(repo_id=repo_id, exist_ok=True, repo_type="model")
@@ -43,7 +43,7 @@ def push_to_hub():
     )
 
     # --- 4. Generate & Push Model Card ---
-    print("📝 Generating Model Card...")
+    print("Generating Model Card...")
     card_data = ModelCardData(
         language='en',
         license='apache-2.0',
@@ -80,7 +80,7 @@ tokenizer = AutoTokenizer.from_pretrained(base_model_name)
     card = ModelCard.from_template(card_data, template_str=content)
     card.push_to_hub(repo_id)
     
-    print(f"✅ Successfully pushed to https://huggingface.co/{repo_id}")
+    print(f"Successfully pushed to https://huggingface.co/{repo_id}")
 
 if __name__ == "__main__":
     push_to_hub()

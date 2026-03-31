@@ -18,7 +18,7 @@ BASE_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
 ADAPTER_NAME = f"{HF_USER_NAME}/mistral-7b-support-adapter"
 
 def load_model():
-    print(f"📦 Loading {BASE_MODEL} and adapter {ADAPTER_NAME}...")
+    print(f"Loading {BASE_MODEL} and adapter {ADAPTER_NAME}...")
     
     # 4-bit Quantization Config
     bnb_config = BitsAndBytesConfig(
@@ -42,7 +42,7 @@ def load_model():
         model = PeftModel.from_pretrained(base_model, ADAPTER_NAME)
     except:
         # Fallback if adapter not yet on Hub
-        print("⚠️ Adapter not found on Hub. Running with base model.")
+        print("Adapter not found on Hub. Running with base model.")
         model = base_model
         
     model.eval()
@@ -80,7 +80,7 @@ def generate_response(user_query):
 
 # --- Gradio UI ---
 with gr.Blocks(theme=gr.themes.Soft()) as demo:
-    gr.Markdown("# 🤖 Customer Support Auto-Resolution Model")
+    gr.Markdown("# Customer Support Auto-Resolution Model")
     gr.Markdown("> **A fine-tuned Mistral-7B model for structured e-commerce/SaaS support.**")
     
     with gr.Row():

@@ -26,7 +26,7 @@ def train():
     token_cfg = config['tokenizer']
 
     # --- 1. Load Tokenizer ---
-    print(f"📦 Loading Tokenizer: {model_cfg['base_model']}...")
+    print(f"Loading Tokenizer: {model_cfg['base_model']}...")
     tokenizer = AutoTokenizer.from_pretrained(model_cfg['base_model'], trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = token_cfg['padding_side']
@@ -40,7 +40,7 @@ def train():
     )
 
     # --- 3. Load Base Model ---
-    print(f"🔥 Loading base model with 4-bit quantization...")
+    print(f"Loading base model with 4-bit quantization...")
     model = AutoModelForCausalLM.from_pretrained(
         model_cfg['base_model'],
         quantization_config=bnb_config,
@@ -67,11 +67,11 @@ def train():
     model.print_trainable_parameters()
 
     # --- 5. Load Dataset ---
-    print(f"📊 Loading processed dataset from data/processed/...")
+    print(f"Loading processed dataset from data/processed/...")
     dataset = load_dataset("json", data_files={"train": "data/processed/train.jsonl", "test": "data/processed/test.jsonl"})
 
     # --- 6. Training Arguments ---
-    print(f"🚀 Setting up TrainingArguments...")
+    print(f"Setting up TrainingArguments...")
     
     # Handle HF Token for potential Hub pushes (using custom env var as requested)
     hf_token = os.getenv("HF_TOKEN")
@@ -117,13 +117,13 @@ def train():
     )
 
     # --- 8. Train! ---
-    print(f"✨ Starting training...")
+    print(f"Starting training...")
     trainer.train()
 
     # --- 9. Save Adapter ---
-    print(f"💾 Saving fine-tuned adapter weights to {train_cfg['output_dir']}...")
+    print(f"Saving fine-tuned adapter weights to {train_cfg['output_dir']}...")
     trainer.model.save_pretrained(train_cfg['output_dir'])
-    print(f"✅ Training Complete!")
+    print(f"Training Complete!")
 
 if __name__ == "__main__":
     train()

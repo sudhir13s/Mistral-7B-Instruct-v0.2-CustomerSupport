@@ -1,10 +1,10 @@
-# 👨‍🔬 The Comprehensive Deep-Dive: Fine-Tuning Mistral-7B
+# The Comprehensive Deep-Dive: Fine-Tuning Mistral-7B
 
 This document provide a "bottom-up" technical explanation of the fine-tuning process. We will move from the hardware layer up to the training logic, explaining the engineering rationale behind every decision.
 
 ---
 
-## 🏗 1. The Hardware Barrier: VRAM & Quantization
+## 1. The Hardware Barrier: VRAM & Quantization
 As an engineer, the primary constraint is the physical memory: **Model Size = Parameters × Precision.**
 
 - **Mistral-7B**: 7 Billion Parameters.
@@ -14,7 +14,7 @@ As an engineer, the primary constraint is the physical memory: **Model Size = Pa
 > [!IMPORTANT]
 > **The Problem**: A standard Google Colab T4 has **16GB VRAM**. While 14GB theoretically fits, you have zero space left for **Gradients** (the math needed to learn), **Activations**, and **Optimizer States**.
 
-### 💎 The Solution: 4-bit Quantization (`bitsandbytes`)
+### The Solution: 4-bit Quantization (`bitsandbytes`)
 We use the `bitsandbytes` library to load the model in 4-bit precision, reducing the footprint to ~5GB.
 
 - `load_in_4bit=True`: Shrinks the model body, leaving 10GB+ for training overhead.
@@ -24,10 +24,10 @@ We use the `bitsandbytes` library to load the model in 4-bit precision, reducing
 
 ---
 
-## 📉 2. Low-Rank Adaptation (LoRA) - The Math
+## 2. Low-Rank Adaptation (LoRA) - The Math
 Instead of updating all 7 Billion weights, we inject two tiny matrices, **A** and **B**, into the existing layers.
 
-### 🧩 The Projection Layers
+### The Projection Layers
 In the Mistral (Transformer) architecture, we target:
 - `q_proj`, `k_proj`, `v_proj`: These handle **Attention** (contextual understanding).
 - `o_proj`: Output Projection; combines attention results.
@@ -43,10 +43,10 @@ In the Mistral (Transformer) architecture, we target:
 
 ---
 
-## 🍱 3. The Dataset: Instruction Tuning Logic
+## 3. The Dataset: Instruction Tuning Logic
 For customer support, we shift from "predictive text" to **Instruction Following**.
 
-### 🎭 The Chat Template
+### The Chat Template
 Mistral utilizes a specific behavioral protocol:
 `<s>[INST] Instruction [/INST] Response </s>`
 
@@ -59,7 +59,7 @@ Mistral utilizes a specific behavioral protocol:
 
 ---
 
-## 🎛 4. Hyperparameters: Turning the Knobs
+## 4. Hyperparameters: Turning the Knobs
 The `SFTTrainer` relies on these critical engineering "knobs":
 
 | Parameter | Recommended | Explanation |
@@ -72,7 +72,7 @@ The `SFTTrainer` relies on these critical engineering "knobs":
 
 ---
 
-## 🚀 5. Summary of the Workflow
+## 5. Summary of the Workflow
 1. **Quantize**: Shrink the 28GB model to 5GB using NF4.
 2. **Adapter Interface**: Target all 7 linear layers (`q`, `k`, `v`, `o`, `gate`, `up`, `down`).
 3. **Instruction Dataset**: Clean your support tickets into the `[INST]` format.

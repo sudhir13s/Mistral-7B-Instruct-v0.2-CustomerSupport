@@ -19,7 +19,7 @@ def run_evaluation():
     adapter_path = config['training']['output_dir']
     
     # --- 1. Load Tokenizer & Base Model ---
-    print(f"📦 Loading Model & Fine-tuned Adapter...")
+    print(f"Loading Model & Fine-tuned Adapter...")
     tokenizer = AutoTokenizer.from_pretrained(model_cfg['base_model'], trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
     
@@ -43,14 +43,14 @@ def run_evaluation():
     model.eval()
 
     # --- 2. Load Test Dataset ---
-    print(f"📊 Loading test set from data/processed/test.jsonl...")
+    print(f"Loading test set from data/processed/test.jsonl...")
     dataset = load_dataset("json", data_files={"test": "data/processed/test.jsonl"})["test"]
     
     # Select a subset for evaluation speed (e.g., first 50 samples)
     eval_set = dataset.select(range(min(50, len(dataset))))
 
     # --- 3. Inference Loop ---
-    print(f"✨ Running inference on {len(eval_set)} samples...")
+    print(f"Running inference on {len(eval_set)} samples...")
     results = []
     
     for entry in tqdm(eval_set):
@@ -89,7 +89,7 @@ def run_evaluation():
     avg_rouge_l = sum(rouge_l_scores) / len(rouge_l_scores)
     
     # BERTScore
-    print(f"📈 Calculating BERTScore...")
+    print(f"Calculating BERTScore...")
     references = [r['reference'] for r in results]
     predictions = [r['prediction'] for r in results]
     P, R, F1 = bert_score(predictions, references, lang="en", verbose=False)
@@ -97,17 +97,17 @@ def run_evaluation():
 
     # --- 5. Report Results ---
     print("\n" + "="*50)
-    print("📊 EVALUATION RESULTS SUMMARY")
+    print("EVALUATION RESULTS SUMMARY")
     print("="*50)
-    print(f"🏆 Average ROUGE-L: {avg_rouge_l:.4f}")
-    print(f"🧠 Average BERTScore (F1): {avg_bert_f1:.4f}")
+    print(f"Average ROUGE-L: {avg_rouge_l:.4f}")
+    print(f"Average BERTScore (F1): {avg_bert_f1:.4f}")
     print("="*50)
     
     # Sample Comparison
-    print("\n📝 Sample Qualitative Check:")
-    print(f"🔹 Prompt: {results[0]['prompt'][:100]}...")
-    print(f"🔸 Reference: {results[0]['reference']}")
-    print(f"✨ Prediction: {results[0]['prediction']}")
+    print("\nSample Qualitative Check:")
+    print(f"Prompt: {results[0]['prompt'][:100]}...")
+    print(f"Reference: {results[0]['reference']}")
+    print(f"Prediction: {results[0]['prediction']}")
     print("="*50)
 
 if __name__ == "__main__":

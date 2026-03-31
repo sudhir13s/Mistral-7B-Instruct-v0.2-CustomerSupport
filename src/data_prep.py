@@ -30,7 +30,7 @@ def prepare_data():
     config = load_config()
     dataset_config = config['dataset']
     
-    print(f"🚀 Loading dataset: {dataset_config['hf_path']}...")
+    print(f"Loading dataset: {dataset_config['hf_path']}...")
     # Load the Bitext dataset
     dataset = load_dataset(dataset_config['hf_path'], split=dataset_config['train_split'])
     
@@ -94,7 +94,7 @@ def prepare_data():
     )
 
     # Save to JSONL
-    print(f"💾 Saving processed data to data/processed/...")
+    print(f"Saving processed data to data/processed/...")
     
     with open("data/processed/train.jsonl", "w") as f:
         for entry in train_data:
@@ -104,7 +104,7 @@ def prepare_data():
         for entry in test_data:
             f.write(json.dumps(entry) + "\n")
 
-    print(f"✅ Data Preparation Complete! (Train: {len(train_data)}, Test: {len(test_data)})")
+    print(f"Data Preparation Complete! (Train: {len(train_data)}, Test: {len(test_data)})")
 
 if __name__ == "__main__":
     prepare_data()

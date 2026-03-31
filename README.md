@@ -1,20 +1,18 @@
-# 🤖 Customer Support Auto-Resolution Model (Fine-Tuning)
-
-> **"Bridging the gap between raw natural language and structured support automation using Mistral-7B."**
+# Customer Support Auto-Resolution Model (Fine-Tuning)
 
 This project demonstrates an end-to-end industry-grade workflow for fine-tuning a Large Language Model (LLM) to act as a **Customer Support Specialist**. By leveraging **QLoRA (4-bit Quantization)**, we transform a general-purpose model into a policy-aware agent capable of generating structured JSON responses (Intent, Response, Action) for E-commerce and SaaS support workflows.
 
 ---
 
-## 🎨 Interactive Demo & Model Hub
-- **🚀 Live Demo (Gradio)**: [Hugging Face Space](https://huggingface.co/spaces/YOUR_HF_USER_NAME/mistral-7b-support-demo)
-- **🧠 Fine-tuned Adapter**: [HF Hub Repository](https://huggingface.co/YOUR_HF_USER_NAME/mistral-7b-support-adapter)
+## Interactive Demo & Model Hub
+- **Live Demo (Gradio)**: [Hugging Face Space](https://huggingface.co/spaces/YOUR_HF_USER_NAME/mistral-7b-support-demo)
+- **Fine-tuned Adapter**: [HF Hub Repository](https://huggingface.co/YOUR_HF_USER_NAME/mistral-7b-support-adapter)
 
 *(Replace `YOUR_HF_USER_NAME` with your actual Hugging Face username in scripts and URLs.)*
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 ```mermaid
 graph TD
     A[Bitext Dataset] -->|Fetch & Format| B[src/data_prep.py]
@@ -27,7 +25,7 @@ graph TD
 
 ---
 
-## 🧠 Key Technologies
+## Key Technologies
 - **Base Model**: `Mistral-7B-Instruct-v0.2` (Best-in-class 7B efficiency).
 - **Optimization**: **QLoRA** (NF4 Quantization + LoRA) to fit training into 16GB VRAM.
 - **Library Stack**: `transformers`, `peft`, `trl` (SFTTrainer), `bitsandbytes`.
@@ -35,7 +33,7 @@ graph TD
 
 ---
 
-## 🚀 Step-by-Step Implementation Guide
+## Step-by-Step Implementation Guide
 
 ### 1. Environment Setup (Google Colab / Local)
 Ensure you set your environment variables for secure authentication:
@@ -83,7 +81,7 @@ python app.py --hf_user $HF_USER_NAME
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 - `configs/config.yaml`: **Single Source of Truth** for all hyperparameters.
 - `src/data_prep.py`: Data collection and instruction formatting logic.
 - `src/train.py`: The QLoRA training engine.
